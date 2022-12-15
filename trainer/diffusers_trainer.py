@@ -888,6 +888,7 @@ def main():
             if args.train_text_encoder:
                 text_encoder.train()
             for _, batch in enumerate(train_dataloader):
+                print('batch' + str(_))
                 if args.resume and global_step < target_global_step:
                     if rank == 0:
                         progress_bar.update(1)
