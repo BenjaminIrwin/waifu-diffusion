@@ -889,6 +889,8 @@ def main():
                 text_encoder.train()
             for _, batch in enumerate(train_dataloader):
                 print('batch' + str(_))
+                print('MEMORY SUMMARY 1:')
+                print(torch.cuda.memory_summary())
                 if args.resume and global_step < target_global_step:
                     if rank == 0:
                         progress_bar.update(1)
@@ -899,6 +901,10 @@ def main():
                     b_start = time.perf_counter()
                     latents = vae.encode(batch['pixel_values'].to(device, dtype=weight_dtype)).latent_dist.sample()
                     latents = latents * 0.18215
+
+                print('MEMORY SUMMARY 2:')
+                print(torch.cuda.memory_summary())
+
 
                 # Sample noise
                 noise = torch.randn_like(latents)
@@ -926,7 +932,10 @@ def main():
                         # Predict the noise residual and compute loss
                         with torch.autocast('cuda', enabled=args.fp16):
                             noise_pred = unet(noisy_latents, timesteps, encoder_hidden_states).sample
-                            
+
+                        print('MEMORY SUMMARY 3:')
+                        print(torch.cuda.memory_summary())
+
                         loss = torch.nn.functional.mse_loss(noise_pred.float(), target.float(), reduction="mean")
 
                         # backprop and update
@@ -936,6 +945,9 @@ def main():
                         scaler.update()
                         lr_scheduler.step()
                         optimizer.zero_grad()
+                        print('MEMORY SUMMARY 4:')
+                        print(torch.cuda.memory_summary())
+
                 else:
                     with unet.join(), text_encoder.join():
                         # Predict the noise residual and compute loss
@@ -1039,6 +1051,9 @@ def main():
                             # log images under single caption
                             if args.enablewandb:
                                 run.log({'images': images}, step=global_step)
+
+                            print('MEMORY SUMMARY 5:')
+                            print(torch.cuda.memory_summary())
 
                             # cleanup so we don't run out of memory
                             del pipeline
