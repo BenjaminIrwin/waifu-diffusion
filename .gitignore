@@ -3,6 +3,3 @@
 **/*.image
 **/*.caption
 **/dataset*.tar
-**/*.json
-**/*.png
-**/*.jpg
