@@ -894,10 +894,11 @@ def main():
                         progress_bar.update(1)
                     global_step += 1
                     continue
-                
-                b_start = time.perf_counter()
-                latents = vae.encode(batch['pixel_values'].to(device, dtype=weight_dtype)).latent_dist.sample()
-                latents = latents * 0.18215
+
+                with torch.no_grad():
+                    b_start = time.perf_counter()
+                    latents = vae.encode(batch['pixel_values'].to(device, dtype=weight_dtype)).latent_dist.sample()
+                    latents = latents * 0.18215
 
                 # Sample noise
                 noise = torch.randn_like(latents)
