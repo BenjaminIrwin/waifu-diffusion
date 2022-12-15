@@ -531,6 +531,8 @@ class AspectDataset(torch.utils.data.Dataset):
     def collate_fn(self, examples):
             pixel_values = torch.stack([example['pixel_values'] for example in examples if example is not None])
             pixel_values.to(memory_format=torch.contiguous_format).float()
+            names = [example['input_ids'] for example in examples if example is not None]
+
 
             if args.extended_mode_chunks < 2:
                 max_length = self.tokenizer.model_max_length - 2
@@ -585,6 +587,7 @@ class AspectDataset(torch.utils.data.Dataset):
             input_ids = torch.stack(tuple(input_ids))
 
             return {
+                'names': names,
                 'pixel_values': pixel_values,
                 'input_ids': input_ids,
                 'tokens': tokens
@@ -898,7 +901,7 @@ def main():
                     global_step += 1
                     continue
 
-                print(batch['input_ids'])
+                print(batch['names'])
 
                 with torch.no_grad():
                     b_start = time.perf_counter()
