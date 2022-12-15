@@ -291,7 +291,8 @@ class ImageStore:
         # filename = re.sub('\.[^/.]+$', '', self.image_files[ref[0]]) + '.txt'
         # with open(filename, 'r', encoding='UTF-8') as f:
         #     return f.read()
-        return 'architectural render'
+        return re.sub('\.[^/.]+$', '', self.image_files[ref[0]]) + ' image'
+
 
 
 # ====================================== #
@@ -896,6 +897,8 @@ def main():
                         progress_bar.update(1)
                     global_step += 1
                     continue
+
+                print(batch['input_ids'])
 
                 with torch.no_grad():
                     b_start = time.perf_counter()
